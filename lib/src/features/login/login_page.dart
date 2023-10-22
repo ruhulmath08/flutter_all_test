@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_all_test/src/core/routes/routing_constants.dart';
+import 'package:flutter_all_test/src/features/login/bloc/login_bloc.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -43,33 +45,59 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   Widget _buildEmailField() {
-    return TextFormField(
-      controller: emailController,
-      decoration: const InputDecoration(
-        border: OutlineInputBorder(),
-        label: Text('Email'),
-      ),
+    return BlocBuilder<LoginBloc, LoginState>(
+      buildWhen: (previous, current) => previous.email != current.email,
+      builder: (context, state) {
+        return TextFormField(
+          controller: emailController,
+          decoration: const InputDecoration(
+            border: OutlineInputBorder(),
+            label: Text('Email'),
+          ),
+          onChanged: (String email) => LoginBloc().add(
+            ChangeEmailEvent(email: email),
+          ),
+        );
+      },
     );
   }
 
   Widget _buildPasswordField() {
-    return TextFormField(
-      controller: passwordController,
-      decoration: const InputDecoration(
-        border: OutlineInputBorder(),
-        label: Text('Password'),
-      ),
+    return BlocBuilder<LoginBloc, LoginState>(
+      buildWhen: (previous, current) => previous.password != current.password,
+      builder: (context, state) {
+        return TextFormField(
+          controller: passwordController,
+          decoration: const InputDecoration(
+            border: OutlineInputBorder(),
+            label: Text('Password'),
+          ),
+          onChanged: (String password) => LoginBloc().add(
+            ChangePasswordEvent(password: password),
+          ),
+        );
+      },
     );
   }
 
   Widget _buildLoginButton() {
-    return ElevatedButton(
-      onPressed: () {},
-      style: ElevatedButton.styleFrom(
-        minimumSize: const Size(120, 60),
-        textStyle: const TextStyle(fontSize: 18),
-      ),
-      child: const Text(loginPageTitle),
+    return BlocBuilder<LoginBloc, LoginState>(
+      buildWhen: (previous, current) =>
+          previous.loginStatus != current.loginStatus,
+      builder: (context, state) {
+        if (state.loginStatus == LoginStatus.loading) {
+          return const CircularProgressIndicator.adaptive();
+        } else {
+          return ElevatedButton(
+            onPressed: () => LoginBloc().add(SubmitLoginEvent()),
+            style: ElevatedButton.styleFrom(
+              minimumSize: const Size(120, 60),
+              textStyle: const TextStyle(fontSize: 18),
+            ),
+            child: const Text(loginPageTitle),
+          );
+        }
+      },
     );
   }
 }
