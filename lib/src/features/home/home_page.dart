@@ -13,7 +13,7 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text(loginPageTitle),
+        title: const Text(homePageTitle),
       ),
       body: _buildBody(),
     );
